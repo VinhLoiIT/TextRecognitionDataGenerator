@@ -1,12 +1,13 @@
 import os
 import random as rnd
+import numpy as np
 
 from PIL import Image, ImageFilter
 
-from trdg import computer_text_generator, background_generator, distorsion_generator
+from . import computer_text_generator, background_generator, distorsion_generator
 
 try:
-    from trdg import handwritten_text_generator
+    from . import handwritten_text_generator
 except ImportError as e:
     print("Missing modules for handwritten text generation.")
 
@@ -119,16 +120,21 @@ class FakeTextDataGenerator(object):
 
         # Horizontal text
         if orientation == 0:
-            new_width = int(
-                distorted_img.size[0]
-                * (float(size - vertical_margin) / float(distorted_img.size[1]))
-            )
-            resized_img = distorted_img.resize(
-                (new_width, size - vertical_margin), Image.ANTIALIAS
-            )
-            resized_mask = distorted_mask.resize((new_width, size - vertical_margin))
-            background_width = width if width > 0 else new_width + horizontal_margin
-            background_height = size
+            if random_angle == 0:
+                new_width = int(
+                    distorted_img.size[0]
+                    * (float(size - vertical_margin) / float(distorted_img.size[1]))
+                )
+                resized_img = distorted_img.resize(
+                    (new_width, size - vertical_margin), Image.ANTIALIAS
+                )
+                resized_mask = distorted_mask.resize((new_width, size - vertical_margin))
+                background_width = width if width > 0 else new_width + horizontal_margin
+                background_height = size
+            else:
+                resized_img = distorted_img
+                resized_mask = distorted_mask
+                background_width, background_height = resized_img.size
         # Vertical text
         elif orientation == 1:
             new_height = int(
